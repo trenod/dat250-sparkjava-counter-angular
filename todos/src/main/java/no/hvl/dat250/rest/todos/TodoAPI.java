@@ -11,6 +11,8 @@ import static spark.Spark.*;
  */
 public class TodoAPI {
 
+
+
     static ArrayList<Todo> todos;
     //static Todo todo = null;
 
@@ -52,11 +54,29 @@ public class TodoAPI {
             return gson.toJson(todos);
         });
 
-        put("/todos", (req,res) -> {
+        put("/todos:id", (req,res) -> {
             Gson gson = new Gson();
-            Todo todoobj = gson.fromJson(req.body(), Todo.class);
-            todos.add(todoobj);
-            return gson.toJson(todoobj);
+            Boolean found = false;
+            Todo todotochange = null;
+            for (Todo todo : todos) {
+                if (todo.getId() == Integer.parseInt(req.params(":id"))) {
+                    todotochange = todo;
+                    found = true;
+                    break;
+                }
+            }
+            if (found) {
+                Todo todoobj = gson.fromJson(req.body(), Todo.class);
+                todos.remove(todotochange);
+                todos.add(todoobj);
+                return gson.toJson(todoobj);
+            } else { return null; }
         });
+    }
+
+    String toJson () {
+        Gson gson = new Gson();
+        String jsonInString = gson.toJson(this);
+        return jsonInString;
     }
 }
