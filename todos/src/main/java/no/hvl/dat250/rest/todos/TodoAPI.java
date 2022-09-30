@@ -27,6 +27,8 @@ public class TodoAPI {
 
         todos = new ArrayList<>();
 
+        Long idinc = 0L;
+
         after((req, res) -> res.type("application/json"));
 
         // TODO: Implement API, such that the testcases succeed.
@@ -39,18 +41,27 @@ public class TodoAPI {
             Gson gson = new Gson();
             Todo todoobj = gson.fromJson(req.body(), Todo.class);
             todos.remove(todoobj);
-            return gson.toJson(todoobj);
+            return todoobj.toJson();
         });
 
         post("/todos", (req, res) -> {
             Gson gson = new Gson();
             Todo todoobj = gson.fromJson(req.body(), Todo.class);
             todos.add(todoobj);
-            return gson.toJson(todoobj);
+            //return gson.toJson(todoobj);
+            return todoobj.toJson();
         });
 
         get("/todos", (req, res) -> {
             Gson gson = new Gson();
+            /*
+            StringBuilder todostring = new StringBuilder();
+            for (Todo todo : todos) {
+                todostring.append(todo.toJson());
+                todostring.append("\n");
+            }
+            return todostring;
+            */
             return gson.toJson(todos);
         });
 
@@ -69,14 +80,11 @@ public class TodoAPI {
                 Todo todoobj = gson.fromJson(req.body(), Todo.class);
                 todos.remove(todotochange);
                 todos.add(todoobj);
-                return gson.toJson(todoobj);
+                //return gson.toJson(todoobj);
+                return todoobj.toJson();
             } else { return null; }
         });
     }
 
-    String toJson () {
-        Gson gson = new Gson();
-        String jsonInString = gson.toJson(this);
-        return jsonInString;
-    }
+
 }
