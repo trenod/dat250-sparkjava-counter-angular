@@ -27,6 +27,7 @@ public class TodoAPI {
         //todo = new Todo();
 
         todos = new ArrayList<>();
+        idinc = 0;
 
 
         after((req, res) -> res.type("application/json"));
@@ -35,20 +36,19 @@ public class TodoAPI {
         //get("/hello", (req, res) -> "Hello World!");
         //get("/counters", (req, res) -> todo.toJson());
 
-        delete("/todos:id", (req, res) -> {
-            Gson gson = new Gson();
-            Todo todoobj = gson.fromJson(req.body().substring(1), Todo.class);
-            Long id = todoobj.getId();
-            System.out.println(todoobj);
-            if (todoobj.getId() == null) {
-                return String.format("Todo with the id  \"%s\" not found!", id);
-            }
+        delete("/todos/:id", (req, res) -> {
             String inid = req.params(":id");
             if (!(isLong(inid))){
                 return (String.format("The id \"%s\" is not a number!", inid));
             }
-            todos.remove(todoobj);
-            return todoobj.toJson();
+            Todo todoobj = getTodo(Long.parseLong(inid));
+            if (todoobj != null){
+                todos.remove(todoobj);
+            } else {
+                return (String.format("Todo with the id \"%s\" not found!", inid));
+            }
+            Gson gson = new Gson();
+            return gson.toJson(todoobj);
         });
 
         post("/todos", (req, res) -> {
@@ -67,9 +67,7 @@ public class TodoAPI {
             return gson.toJson(todos);
         });
 
-
-        get("/todos:id", (req, res) -> {
-            //Gson gson = new Gson();
+        get("/todos/:id", (req, res) -> {
             String idin = req.params(":id");
             if (!(isLong(idin))){
                 return (String.format("The id \"%s\" is not a number!", idin));
@@ -78,7 +76,7 @@ public class TodoAPI {
 
             Todo gTodo = getTodo(id);
             if (gTodo == null) {
-                return (String.format("Todo with the id \"%s\" not found!", idin));
+                return (String.format("Todo with the id  \"%s\" not found!", idin));
 
             } else {
                 Gson gson = new Gson();
@@ -86,26 +84,23 @@ public class TodoAPI {
             }
         });
 
-        put("/todos:id", (req,res) -> {
+        put("/todos/:id", (req,res) -> {
             Gson gson = new Gson();
-            Boolean found = false;
-            Todo todotochange = null;
+            Todo todotochange;
+            String idin = req.params(":id");
+            if (!(isLong(idin))){
+                return (String.format("The id \"%s\" is not a number!", idin));
+            }
             for (Todo todo : todos) {
                 if (todo.getId() == Integer.parseInt(req.params(":id"))) {
                     todotochange = todo;
-                    found = true;
-                    break;
+                    Todo todoobj = gson.fromJson(req.body(), Todo.class);
+                    todos.remove(todotochange);
+                    todos.add(todoobj);
+                    return gson.toJson(todoobj);
                 }
             }
-            if (!found) {
-                return null;
-            } else {
-                Todo todoobj = gson.fromJson(req.body(), Todo.class);
-                todos.remove(todotochange);
-                todos.add(todoobj);
-                //return todoobj.toJson();
-                return gson.toJson(todoobj);
-            }
+            return (String.format("Todo with the id  \"%s\" not found!", idin));
         });
     }
 
