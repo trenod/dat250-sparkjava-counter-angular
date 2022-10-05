@@ -14,6 +14,7 @@ public class TodoAPI {
 
 
     static ArrayList<Todo> todos;
+    static int idinc;
     //static Todo todo = null;
 
     public static void main(String[] args) {
@@ -27,42 +28,58 @@ public class TodoAPI {
 
         todos = new ArrayList<>();
 
-        Long idinc = 0L;
 
         after((req, res) -> res.type("application/json"));
 
         // TODO: Implement API, such that the testcases succeed.
-
         //get("/hello", (req, res) -> "Hello World!");
-
         //get("/counters", (req, res) -> todo.toJson());
 
-        delete("/todos", (req, res) -> {
+        delete("/todos:id", (req, res) -> {
             Gson gson = new Gson();
-            Todo todoobj = gson.fromJson(req.body(), Todo.class);
+            Todo todoobj = gson.fromJson(req.body().substring(1), Todo.class);
+            Long id = todoobj.getId();
+            System.out.println(todoobj);
+            if (todoobj.getId() == null) {
+                return String.format("Todo with the id  \"%s\" not found!", id);
+            }
             todos.remove(todoobj);
             return todoobj.toJson();
         });
 
         post("/todos", (req, res) -> {
             Gson gson = new Gson();
-            Todo todoobj = gson.fromJson(req.body(), Todo.class);
-            todos.add(todoobj);
-            //return gson.toJson(todoobj);
-            return todoobj.toJson();
+            String todoJson = "{id:"+ idinc + ",\n"+req.body().substring(1);
+            idinc +=1 ;
+
+            Todo createdTodo = gson.fromJson(todoJson, Todo.class);
+            todos.add(createdTodo);
+            Todo nnTodo = getTodo(createdTodo.getId());
+            return nnTodo.toJson();
         });
 
         get("/todos", (req, res) -> {
             Gson gson = new Gson();
-            /*
-            StringBuilder todostring = new StringBuilder();
-            for (Todo todo : todos) {
-                todostring.append(todo.toJson());
-                todostring.append("\n");
-            }
-            return todostring;
-            */
             return gson.toJson(todos);
+        });
+
+
+        get("/todos:id", (req, res) -> {
+            //Gson gson = new Gson();
+            String idin = req.params(":id");
+            if (!(isLong(idin))){
+                return (String.format("The id \"%s\" is not a number!", idin));
+            }
+            Long id = Long.parseLong(idin);
+
+            Todo gTodo = getTodo(id);
+            if (gTodo == null) {
+                return (String.format("Todo with the id \"%s\" not found!", idin));
+
+            } else {
+                Gson gson = new Gson();
+                return gson.toJson(gTodo);
+            }
         });
 
         put("/todos:id", (req,res) -> {
@@ -84,6 +101,23 @@ public class TodoAPI {
                 return todoobj.toJson();
             } else { return null; }
         });
+    }
+
+    private static Boolean isLong (String num) {
+        try {
+            Long.parseLong(num);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+
+    private static Todo getTodo(Long todoId) {
+        Todo todo = todos.stream()
+                .filter(t -> todoId.equals(t.getId()))
+                .findAny()
+                .orElse(null);
+        return todo;
     }
 
 
