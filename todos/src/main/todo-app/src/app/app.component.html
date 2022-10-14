@@ -6,22 +6,16 @@
     <th>Summary</th>
     <th></th>
   </tr>
+  <div *ngFor="let todo of todos">
   <tr>
-    <td>1</td>
-    <td>Description1</td>
-    <td>Summary1</td>
+    <td>{todo.id}</td>
+    <td>{todo.description}</td>
+    <td>{todo.summary}</td>
     <td>
       <button>Delete</button>
     </td>
   </tr>
-  <tr>
-    <td>2</td>
-    <td>Description2</td>
-    <td>Summary2</td>
-    <td>
-      <button>Delete</button>
-    </td>
-  </tr>
+  </div>
 </table>
 <button>Refresh</button>
 <h2>Todo</h2>
