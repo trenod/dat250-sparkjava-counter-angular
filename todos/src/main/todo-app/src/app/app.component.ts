@@ -11,19 +11,40 @@ export class AppComponent {
   title = 'todo-app';
   constructor(private httpClient: HttpClient) {
     this.loadTodos();
+
   }
+
+  todos: any[] = []
 
   loadTodos(){
-    this.httpClient.get('http://localhost:8080/todos').subscribe((response) =>
-      alert(JSON.stringify(response)));
+    this.httpClient.get('http://localhost:8080/todos').subscribe((todos: any) =>
+      this.todos = todos);
+
 
   }
 
-  createTodo(id: number, summary: string, description: string) {
-    var toPost:String[];
-    toPost = [id.toString(), summary, description]
-    this.httpClient.post('http://localhost:8080/todos', toPost).subscribe((response) =>
+  createTodo() {
+    var toPost: string
+    //toPost = summary
+    //toPost += " "
+    //toPost += description
+    this.httpClient.post('http://localhost:8080/todos', {
+        summary: "This is the summary",
+        description: "This is the description",
+      })
+      .subscribe((response) => {
+      alert(JSON.stringify(response));
+      },
+      (error) => {
+      alert(JSON.stringify(error));
+      }
+      );
+  }
+
+  deleteTodo(id: number) {
+    this.httpClient.delete('http://localhost:8080/todos/{id}').subscribe((response) =>
       alert(JSON.stringify(response)));
+
   }
 
 }

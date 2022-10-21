@@ -8,19 +8,31 @@
   </tr>
   <div *ngFor="let todo of todos">
   <tr>
-    <td>{todo.id}</td>
-    <td>{todo.description}</td>
-    <td>{todo.summary}</td>
+    <td>{{todo.id}}</td>
+    <td>{{todo.description}}</td>
+    <td>{{todo.summary}}</td>
     <td>
-      <button>Delete</button>
+      <button (click)="deleteTodo(todo.id)">Delete</button>
     </td>
   </tr>
   </div>
 </table>
-<button>Refresh</button>
+<button (click)="loadTodos()">Refresh</button>
 <h2>Todo</h2>
 <label for="desc">Description:</label><br>
 <input type="text" id="desc" name="desc"><br>
 <label for="sum">Summary:</label><br>
 <input type="text" id="sum" name="sum"><br>
-<button>Add</button>
+<script>
+  export const summ = "" + document.getElementById("sum").value
+  export const descr = "" + document.getElementById("desc").value
+
+    // Here the value is stored in new variable x
+    function myFunction() {
+      this.createTodo(summ, descr)
+    }
+</script>
+<button (click)="this.createTodo()">Add</button>
+
+
+
